@@ -1,0 +1,1 @@
+web: gunicorn dryce.wsgi --log-file -
