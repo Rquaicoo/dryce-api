@@ -14,9 +14,9 @@ class VendorDetails(models.Model):
     business_certificate=models.FileField(null=True, blank=True)
     resume=models.FileField(null=True,blank=True)
     business_name=models.CharField(max_length=100) 
-    Phone_number=models.CharField(max_length=100)  
+    phone_number=models.CharField(max_length=10)  
     business_picture=models.ImageField(null=True, blank=True)
-    Location=models.CharField(max_length=100)
+    location=models.CharField(max_length=100)
 
     def __str__(self):
-        return str(self.Name)  
+        return str(self.business_name)  
