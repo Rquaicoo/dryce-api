@@ -26,3 +26,6 @@ class RegularUserView(serializers.ModelSerializer):
     model = RegularUser
     fields = ('id','user','phone_number')
 
+class RegularUserView(serializers.ModelSerializer):
+    model = VendorDetails
+    fields = ('id','business_certificate','resume','business_name','Phone_number',' business_picture','Location')
