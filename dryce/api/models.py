@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 class RegularUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=10, blank=False, null=False)
+    otp = models.CharField(max_length=6, blank=True, null=True)
     verified = models.BooleanField(default=False)
 
     def __str__(self):
