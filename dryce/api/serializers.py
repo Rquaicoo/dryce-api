@@ -28,4 +28,4 @@ class RegularUserView(serializers.ModelSerializer):
 
 class RegularUserView(serializers.ModelSerializer):
     model = VendorDetails
-    fields = ('id','business_certificate','resume','business_name','Phone_number',' business_picture','Location')
+    fields = ('id','business_certificate','resume','business_name','phone_number',' business_picture','location')
