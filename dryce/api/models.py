@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 
 class RegularUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=10, blank=False, null=False)
     otp = models.CharField(max_length=6, blank=True, null=True)
     verified = models.BooleanField(default=False)
 
@@ -19,7 +18,9 @@ class Vendor(models.Model):
 
     def __str__(self):
         return str(self.user)
+
 class VendorDetails(models.Model):
+    vendor = models.OneToOneField(Vendor, on_delete=models.CASCADE, blank=False)
     business_certificate=models.FileField(blank=False)
     resume=models.FileField(null=False,blank=False)
     business_name=models.CharField(max_length=100, blank=False, null=False) 
@@ -28,4 +29,5 @@ class VendorDetails(models.Model):
     location=models.CharField(max_length=100, null=False,blank=False)
 
     def __str__(self):
-        return str(self.business_name)  
+        return str(self.vendor)  
+
