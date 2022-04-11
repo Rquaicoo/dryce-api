@@ -1,5 +1,7 @@
+from dataclasses import field
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from .models import *
 
 
@@ -23,9 +25,33 @@ class CreateUserSerializer(serializers.ModelSerializer):
         return user
 
 class RegularUserView(serializers.ModelSerializer):
-    model = RegularUser
-    fields = ('id','user','phone_number')
+    class Meta:
+        model = RegularUser
+        fields = ('id','user',)
+
+class VerifyUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RegularUser
+        fields = ('id','otp')
 
 class RegularUserView(serializers.ModelSerializer):
-    model = VendorDetails
-    fields = ('id','business_certificate','resume','business_name','phone_number',' business_picture','location')
+    class Meta:
+        model = VendorDetails
+        fields = ('id','business_certificate','resume','business_name','phone_number',' business_picture','location')
+
+class ResetOTPSerializer(serializers.ModelSerializer):
+    otp = serializers.CharField(required=True)
+    class Meta:
+        model = RegularUser
+        fields = ('otp',)
+    
+class ResetPasswordSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(required=True)
+    class Meta:
+        model = User
+        fields = ('email', 'otp', 'password',)
+
+class SearchRegularUserSerializer(serializers.ModelSerializer):
+    model = RegularUser
+    fields = ('id', 'user')
+
