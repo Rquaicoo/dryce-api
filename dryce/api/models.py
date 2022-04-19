@@ -5,29 +5,12 @@ from django.contrib.auth.models import User
 
 class RegularUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    otp = models.CharField(max_length=6, blank=True, null=True)
+    otp = models.CharField(max_length=4, blank=True, null=True)
     verified = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.user.username)
 
-class Vendor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=10, null=False, blank=False)
-    verified = models.BooleanField(default=False)
 
-    def __str__(self):
-        return str(self.user)
 
-class VendorDetails(models.Model):
-    vendor = models.OneToOneField(Vendor, on_delete=models.CASCADE, blank=False)
-    business_certificate=models.FileField(blank=False)
-    resume=models.FileField(null=False,blank=False)
-    business_name=models.CharField(max_length=100, blank=False, null=False) 
-    phone_number=models.CharField(max_length=10, blank=False, null=False)  
-    business_picture=models.ImageField(blank=False)
-    location=models.CharField(max_length=100, null=False,blank=False)
-
-    def __str__(self):
-        return str(self.vendor)  
 
