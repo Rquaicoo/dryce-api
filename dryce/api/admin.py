@@ -3,4 +3,3 @@ from .models import *
 # Register your models here.
 
 admin.site.register(RegularUser)
-admin.site.register(VendorDetails)
