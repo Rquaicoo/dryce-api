@@ -34,19 +34,12 @@ class VerifyUserSerializer(serializers.ModelSerializer):
         model = RegularUser
         fields = ('id','otp')
 
-class RegularUserView(serializers.ModelSerializer):
-    class Meta:
-        model = VendorDetails
-        fields = ('id','business_certificate','resume','business_name','phone_number',' business_picture','location')
-
 class ResetOTPSerializer(serializers.ModelSerializer):
-    otp = serializers.CharField(required=True)
     class Meta:
         model = RegularUser
         fields = ('otp',)
     
 class ResetPasswordSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(required=True)
     class Meta:
         model = User
         fields = ('email', 'otp', 'password',)
