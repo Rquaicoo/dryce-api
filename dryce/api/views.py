@@ -121,3 +121,94 @@ class SearchRegulerUserAPIView(APIView):
         serializer = SearchRegularUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class CartAPIView(APIView):
+    def get(self, request):
+        if request.user.is_authenticated:
+            user = RegularUser.objects.get(user=request.user)
+            cart = Cart.objects.get(user=user)
+            serializer = CartSerializer(cart)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            cart = RegularUser.objects.get(user=user)
+            serializer = CartSerializer(cart, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            cart = RegularUser.objects.get(user=user)
+            serializer = CartSerializer(cart, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            cart = RegularUser.objects.get(user=user)
+            cart.delete()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+'''class VendorChatAPIView(APIView):
+    def get(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            chat = Vendor.objects.get(user=user)
+            serializer = ChatSerializer(chat)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            chat = Vendor.objects.get(user=user)
+            serializer = ChatSerializer(chat, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            chat = Chat.objects.get(user=user)
+            serializer = ChatSerializer(chat, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            chat = Chat.objects.get(user=user)
+            chat.delete()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+ '''
