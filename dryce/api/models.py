@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from vendor.models import Vendor
 # Create your models here.
 
 class RegularUser(models.Model):
@@ -29,5 +29,13 @@ class Cart(models.Model):
     def __str__(self):
         return str(self.user.username)
 
+class VendorChat(models.Model):
+    user = models.ForeignKey(RegularUser, on_delete=models.CASCADE)
+    reciever = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='reciever')
+    message = models.CharField(max_length=100, blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.user.username)
 
 
