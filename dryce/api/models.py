@@ -26,5 +26,8 @@ class Cart(models.Model):
     ties = models.IntegerField(blank=True, null=True)
     cost = models.IntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.user.username)
+
 
 
