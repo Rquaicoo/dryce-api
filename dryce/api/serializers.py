@@ -48,3 +48,10 @@ class SearchRegularUserSerializer(serializers.ModelSerializer):
     model = RegularUser
     fields = ('id', 'user')
 
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = ('id', 'user', 'identifier', 'tshirts', 
+        'jeans', 'siglets', 'jackets', 'trousers', 'suits', 
+        'blazers', 'skirts', 'blouses', 'ties', 'cost')
+
