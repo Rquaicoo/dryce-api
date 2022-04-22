@@ -19,6 +19,7 @@ def sendEmail(subject, message, from_email, recipient):
     except Exception as e:
         print(e)
         return False
+
 # Create your views here.
 
 class CreateUserView(CreateAPIView):
@@ -67,6 +68,21 @@ class LogoutUserAPIView(APIView):
         token = Token.objects.get(key=data)
         token.delete()
         return Response(status=status.HTTP_200_OK)
+
+class ContactAPIView(APIView):
+    def get(self,request):
+        contacts = Contact.objects.all()
+        serializer = ContactSerializer(contacts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def post(self, request):
+        serializer = ContactSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_201_CREATED)
+
+
 
 class VerifyUserAPIView(APIView):
     def post(self, request):

@@ -55,3 +55,7 @@ class CartSerializer(serializers.ModelSerializer):
         'jeans', 'siglets', 'jackets', 'trousers', 'suits', 
         'blazers', 'skirts', 'blouses', 'ties', 'cost')
 
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields = ('name', 'email', 'message')
