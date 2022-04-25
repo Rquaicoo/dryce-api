@@ -8,6 +8,7 @@ class Vendor(models.Model):
     verified = models.BooleanField(default=False)
     certified = models.BooleanField(default=False)
     rating = models.IntegerField(default=0)
+    rating_count = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.user)

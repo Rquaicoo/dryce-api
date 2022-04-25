@@ -1,4 +1,4 @@
-from django.shortcuts import render
+
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -10,6 +10,7 @@ import random
 from django.contrib.auth.models import User
 #import send_mail
 from django.core.mail import send_mail
+from vendor.models import Vendor
 
 
 def sendEmail(subject, message, from_email, recipient):
@@ -184,48 +185,13 @@ class CartAPIView(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-'''class VendorChatAPIView(APIView):
-    def get(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            chat = Vendor.objects.get(user=user)
-            serializer = ChatSerializer(chat)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
+class RatingAPIView(APIView):
     def post(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            chat = Vendor.objects.get(user=user)
-            serializer = ChatSerializer(chat, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            chat = Chat.objects.get(user=user)
-            serializer = ChatSerializer(chat, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            chat = Chat.objects.get(user=user)
-            chat.delete()
-            return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
- '''
+        data = dict(request.data)
+        vendor = Vendor.objects.get(id=data['vendor_id'])
+        rating = int(data["rating"])
+        vendor.rating = rating
+        vendor.rating_count += 1
+        vendor.save()
+        return Response(status=status.HTTP_200_OK)
+  
