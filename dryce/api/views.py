@@ -1,4 +1,4 @@
-from django.shortcuts import render
+
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -10,6 +10,7 @@ import random
 from django.contrib.auth.models import User
 #import send_mail
 from django.core.mail import send_mail
+from vendor.models import Vendor
 
 
 def sendEmail(subject, message, from_email, recipient):
@@ -19,6 +20,7 @@ def sendEmail(subject, message, from_email, recipient):
     except Exception as e:
         print(e)
         return False
+
 # Create your views here.
 
 class CreateUserView(CreateAPIView):
@@ -32,7 +34,8 @@ class CreateUserView(CreateAPIView):
         headers = self.get_success_headers(serializer.data)
 
         #generate user token
-        token = Token.objects.create(user=serializer.instance).key
+        token = Token.objects.create(user=serializer.instance)
+        token = token.key
 
         #generate otp
         otp = ''.join(str(random.randint(0,9)) for i in range(4))
@@ -67,6 +70,21 @@ class LogoutUserAPIView(APIView):
         token = Token.objects.get(key=data)
         token.delete()
         return Response(status=status.HTTP_200_OK)
+
+class ContactAPIView(APIView):
+    def get(self,request):
+        contacts = Contact.objects.all()
+        serializer = ContactSerializer(contacts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def post(self, request):
+        serializer = ContactSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_201_CREATED)
+
+
 
 class VerifyUserAPIView(APIView):
     def post(self, request):
@@ -167,48 +185,13 @@ class CartAPIView(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-'''class VendorChatAPIView(APIView):
-    def get(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            chat = Vendor.objects.get(user=user)
-            serializer = ChatSerializer(chat)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
+class RatingAPIView(APIView):
     def post(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            chat = Vendor.objects.get(user=user)
-            serializer = ChatSerializer(chat, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            chat = Chat.objects.get(user=user)
-            serializer = ChatSerializer(chat, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            chat = Chat.objects.get(user=user)
-            chat.delete()
-            return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
- '''
+        data = dict(request.data)
+        vendor = Vendor.objects.get(id=data['vendor_id'])
+        rating = int(data["rating"])
+        vendor.rating = rating
+        vendor.rating_count += 1
+        vendor.save()
+        return Response(status=status.HTTP_200_OK)
+  
