@@ -121,3 +121,11 @@ class SearchVendorAPIView(APIView):
         serializer = VendorViewSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class RatingVendorAPIView(APIView):
+    def get(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            vendor = Vendor.objects.get(user=user)
+            serializer = VendorRatingSerializer(vendor)
+            return Response(serializer.data, status=status.HTTP_200_OK)
