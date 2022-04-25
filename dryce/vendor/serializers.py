@@ -39,6 +39,11 @@ class VerifyVendorSerializer(serializers.ModelSerializer):
         model = Vendor
         fields = ('id','otp')
 
+class VendorRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vendor
+        fields = ('id','rating','rating_count')
+
 class ResetOTPSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vendor
