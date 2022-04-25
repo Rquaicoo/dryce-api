@@ -33,7 +33,8 @@ class CreateUserView(CreateAPIView):
         headers = self.get_success_headers(serializer.data)
 
         #generate user token
-        token = Token.objects.create(user=serializer.instance).key
+        token = Token.objects.create(user=serializer.instance)
+        token = token.key
 
         #generate otp
         otp = ''.join(str(random.randint(0,9)) for i in range(4))

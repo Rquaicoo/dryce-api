@@ -14,7 +14,10 @@ class RegularUser(models.Model):
 
 class Cart(models.Model):
     user = models.ForeignKey(RegularUser, on_delete=models.CASCADE)
+    cost = models.IntegerField(blank=True, null=True)
+    status = models.CharField(max_length=10, blank=True, null=True)
     identifier = models.CharField(max_length=10, blank=True, null=True)
+    
     tshirts = models.IntegerField(blank=True, null=True)
     jeans = models.IntegerField(blank=True, null=True)
     siglets = models.IntegerField(blank=True, null=True)
@@ -25,7 +28,7 @@ class Cart(models.Model):
     skirts = models.IntegerField(blank=True, null=True)
     blouses = models.IntegerField(blank=True, null=True)
     ties = models.IntegerField(blank=True, null=True)
-    cost = models.IntegerField(blank=True, null=True)
+    
 
     def __str__(self):
         return str(self.user.username)
