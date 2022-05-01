@@ -44,6 +44,11 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'otp', 'password',)
 
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id','username','email','first_name','last_name','is_active', 'last_login')
+
 class SearchRegularUserSerializer(serializers.ModelSerializer):
     model = RegularUser
     fields = ('id', 'user')
