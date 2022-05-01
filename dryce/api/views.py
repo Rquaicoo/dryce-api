@@ -28,34 +28,44 @@ class CreateUserView(CreateAPIView):
     permission_classses = [AllowAny]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-
-        #generate user token
-        token = Token.objects.create(user=serializer.instance)
-        token = token.key
-
-        #generate otp
-        otp = ''.join(str(random.randint(0,9)) for i in range(4))
         
-        user = User.objects.get(username=serializer.data['username'])
-        RegularUser.objects.create(
-            user = user,
-            otp = otp,
-        )
+        serializer = self.get_serializer(data=request.data)
 
-        #send otp to user
-        send_mail('OTP', 'Your OTP is ' + otp, 'dryce.com', [serializer.data['email']], fail_silently=True)
+        
+        serializer.is_valid(raise_exception=True)
+        #check if email exists
+        if User.objects.filter(email=serializer.validated_data['email']).exists():
+            return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        #check if username exists
+        elif User.objects.filter(username=serializer.validated_data['username']).exists():
+            return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.validated_data)
+
+            #generate user token
+            token = Token.objects.create(user=serializer.instance)
+            token = token.key
+
+            #generate otp
+            otp = ''.join(str(random.randint(0,9)) for i in range(4))
+            
+            user = User.objects.get(username=serializer.validated_data['username'])
+            RegularUser.objects.create(
+                user = user,
+                otp = otp,
+            )
+
+            #send otp to user
+            send_mail('OTP', 'Your OTP is ' + otp, 'dryce.com', [serializer.validated_data['email']], fail_silently=True)
 
 
-        token_data = {"token": token}
-        return Response(
-            {**serializer.data, **token_data},
-            status = status.HTTP_201_CREATED,
-            headers=headers
-        )
+            token_data = {"token": token}
+            return Response(
+                {**serializer.validated_data, **token_data},
+                status = status.HTTP_201_CREATED,
+                headers=headers
+            )
 
 
 class LogoutUserAPIView(APIView):
@@ -85,18 +95,20 @@ class ContactAPIView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-
 class VerifyUserAPIView(APIView):
     def post(self, request):
-        data = dict(request.data)
-        user = Token.objects.get(key=data["token"]).user
-        regular_user = RegularUser.objects.get(user=user)
-        if regular_user.otp == data['otp']:
-            regular_user.verified = True
-            regular_user.save()
-            return Response(status=status.HTTP_200_OK)
+        if request.user.is_authenticated:
+            data = dict(request.data)
+            user = request.user
+            regular_user = RegularUser.objects.get(user=user)
+            if regular_user.otp == data['otp']:
+                regular_user.verified = True
+                regular_user.save()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     
 class OTPAPIView(APIView):
@@ -114,13 +126,16 @@ class OTPAPIView(APIView):
                 return Response(status=status.HTTP_200_OK)
 
     def post(self, request):
-        data = dict(request.data)
-        user = User.objects.get(email=data['email'])
-        otp = ''.join(str(random.randint(0,9)) for i in range(4))
-        user.otp = otp
-        user.save()
-        send_mail('OTP', 'Your OTP is ' + otp, 'dryce.com', [data['email']], fail_silently=True)
-        return Response(status=status.HTTP_200_OK)
+        if request.user.is_authenticated:
+            data = dict(request.data)
+            user = User.objects.get(email=data['email'])
+            otp = ''.join(str(random.randint(0,9)) for i in range(4))
+            user.otp = otp
+            user.save()
+            send_mail('OTP', 'Your OTP is ' + otp, 'dryce.com', [data['email']], fail_silently=True)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class ResetPasswordAPIView(APIView):
@@ -132,12 +147,27 @@ class ResetPasswordAPIView(APIView):
             user.save()
             return Response(status=status.HTTP_200_OK)
 
+
 class SearchRegulerUserAPIView(APIView):
     def post(self, request):
         data = dict(request.data)
         user = User.objects.get(username__icontains=data['username'])
         serializer = SearchRegularUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ProfileAPIView(APIView):
+    def get(self, request):
+        user = request.user
+        serializer = ProfileSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        data = dict(request.data)
+        user = request.user
+        user.first_name = data['first_name']
+        user.last_name = data['last_name']
+        user.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 class CartAPIView(APIView):
