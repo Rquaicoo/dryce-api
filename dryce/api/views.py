@@ -28,34 +28,44 @@ class CreateUserView(CreateAPIView):
     permission_classses = [AllowAny]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-
-        #generate user token
-        token = Token.objects.create(user=serializer.instance)
-        token = token.key
-
-        #generate otp
-        otp = ''.join(str(random.randint(0,9)) for i in range(4))
         
-        user = User.objects.get(username=serializer.data['username'])
-        RegularUser.objects.create(
-            user = user,
-            otp = otp,
-        )
+        serializer = self.get_serializer(data=request.data)
 
-        #send otp to user
-        send_mail('OTP', 'Your OTP is ' + otp, 'dryce.com', [serializer.data['email']], fail_silently=True)
+        
+        serializer.is_valid(raise_exception=True)
+        #check if email exists
+        if User.objects.filter(email=serializer.data['email']).exists():
+            return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        #check if username exists
+        elif User.objects.filter(username=serializer.data['username']).exists():
+            return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+
+            #generate user token
+            token = Token.objects.create(user=serializer.instance)
+            token = token.key
+
+            #generate otp
+            otp = ''.join(str(random.randint(0,9)) for i in range(4))
+            
+            user = User.objects.get(username=serializer.data['username'])
+            RegularUser.objects.create(
+                user = user,
+                otp = otp,
+            )
+
+            #send otp to user
+            send_mail('OTP', 'Your OTP is ' + otp, 'dryce.com', [serializer.data['email']], fail_silently=True)
 
 
-        token_data = {"token": token}
-        return Response(
-            {**serializer.data, **token_data},
-            status = status.HTTP_201_CREATED,
-            headers=headers
-        )
+            token_data = {"token": token}
+            return Response(
+                {**serializer.data, **token_data},
+                status = status.HTTP_201_CREATED,
+                headers=headers
+            )
 
 
 class LogoutUserAPIView(APIView):
