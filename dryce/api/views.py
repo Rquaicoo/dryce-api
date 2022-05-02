@@ -217,11 +217,14 @@ class CartAPIView(APIView):
 
 class RatingAPIView(APIView):
     def post(self, request):
-        data = dict(request.data)
-        vendor = Vendor.objects.get(id=data['vendor_id'])
-        rating = int(data["rating"])
-        vendor.rating = rating
-        vendor.rating_count += 1
-        vendor.save()
-        return Response(status=status.HTTP_200_OK)
+        if request.user.is_authenticated:
+            data = dict(request.data)
+            vendor = Vendor.objects.get(id=data['vendor_id'])
+            rating = int(data["rating"])
+            vendor.rating = rating
+            vendor.rating_count += 1
+            vendor.save()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
   
