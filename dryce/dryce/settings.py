@@ -98,12 +98,37 @@ WSGI_APPLICATION = 'dryce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+'''
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dryce',
+        'USER': 'postgres',
+        'PASSWORD': 'R0245437556q',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    },
+}'''
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd1qmsmgeorld85',
+        'USER': 'rbhqzrsijwiabq',
+        'PASSWORD': '45ec37ee75d5c622807a7f71f038ff3770042477f6de144c11db88bbff2a33ff',
+        'HOST': 'ec2-54-160-109-68.compute-1.amazonaws.com',
+        'PORT': '5432',
+    },
+}
+
 
 
 # Password validation
