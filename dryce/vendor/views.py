@@ -11,6 +11,12 @@ from django.contrib.auth.models import User
 #import send_mail
 from django.core.mail import send_mail
 
+#import models.py from vendor
+from vendor.models import Vendor
+
+#import serializers.py from vendor
+from vendor.serializers import VendorDetailsSerializer
+
 
 def sendEmail(subject, message, from_email, recipient):
     try:
