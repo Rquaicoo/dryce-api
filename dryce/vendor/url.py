@@ -10,6 +10,7 @@ urlpatterns = [
     path('auth/verify_user/', VerifyVendorAPIView.as_view(), name="verify_user"),
     path('auth/reset_password/', ResetPasswordAPIView.as_view(), name="reset_password"),
     path('auth/reset_otp/', ResetOTPAPIView.as_view(), name="reset_otp"),
+   
 
 
     
