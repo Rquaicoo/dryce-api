@@ -1,3 +1,4 @@
+from cgitb import reset
 from django import views
 from django.urls import path
 from .views import *
@@ -9,4 +10,9 @@ urlpatterns = [
     path('auth/logout/', LogoutUserAPIView.as_view(), name="logout"),
     path('auth/verify_user/', VerifyUserAPIView.as_view(), name="verify_user"),
     path('auth/vendor/register/', CreateUserView.as_view(), name="vendor_register"),
+    path('resend_otp/', OTPAPIView.as_view(), name="resend_otp"),
+    path('reset_password/', ResetPasswordAPIView.as_view(), name="reset_password"),
+    path('cart/', CartAPIView.as_view(), name="cart"),
+    path('rating/', RatingAPIView.as_view(), name="rating"),
+    path('contact/', ContactAPIView.as_view(), name="contact"),
 ]
