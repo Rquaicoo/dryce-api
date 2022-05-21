@@ -123,19 +123,19 @@ class OTPAPIView(APIView):
                 regular_user.otp = otp
                 regular_user.save()
                 send_mail('OTP', 'Your OTP is ' + otp, 'dryce.com', [user.email], fail_silently=True)
-                return Response(status=status.HTTP_200_OK)
+                return Response({"message": "OTP sent."},status=status.HTTP_200_OK)
 
     def post(self, request):
-        if request.user.is_authenticated:
             data = dict(request.data)
-            user = User.objects.get(email=data['email'])
-            otp = ''.join(str(random.randint(0,9)) for i in range(4))
-            user.otp = otp
-            user.save()
-            send_mail('OTP', 'Your OTP is ' + otp, 'dryce.com', [data['email']], fail_silently=True)
-            return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            try:
+                user = User.objects.get(email=data['email'])
+                otp = ''.join(str(random.randint(0,9)) for i in range(4))
+                user.otp = otp
+                user.save()
+                send_mail('OTP', 'Your OTP is ' + otp, 'dryce.com', [data['email']], fail_silently=True)
+                return Response({"message": "OTP sent."},status=status.HTTP_200_OK)
+            except:
+                return Response({"error":"Your email does not exist"},status=status.HTTP_400_BAD_REQUEST)
 
 
 class ResetPasswordAPIView(APIView):
@@ -146,6 +146,8 @@ class ResetPasswordAPIView(APIView):
             user.set_password(data['password'])
             user.save()
             return Response(status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "data is incorrect"},status=status.HTTP_400_BAD_REQUEST)
 
 
 class SearchRegulerUserAPIView(APIView):
