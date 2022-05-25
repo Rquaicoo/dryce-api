@@ -104,11 +104,35 @@ class VerifyUserAPIView(APIView):
             if regular_user.otp == data['otp']:
                 regular_user.verified = True
                 regular_user.save()
-                return Response(status=status.HTTP_200_OK)
+                return Response({"message":"succcessful"},status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+class ValidEmailAPIView(APIView):
+    authentication_classes = []
+    permission_classes = []
+    
+    def post(self, request):
+        data = dict(request.data)
+        if User.objects.filter(email=data['email']).exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_200_OK)
+
+class ValidUsernameAPIView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        data = dict(request.data)
+        emails = User.objects.filter(username=data['username'])
+        if User.objects.filter(username=data['username']).exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_200_OK)
 
     
 class OTPAPIView(APIView):
