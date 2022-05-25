@@ -36,10 +36,10 @@ class CreateVendorView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         #check if email exists
-        if User.objects.filter(email=serializer.data['email']).exists():
+        if User.objects.filter(email=serializer.validated_data['email']).exists():
             return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
         #check if username exists
-        elif User.objects.filter(username=serializer.data['username']).exists():
+        elif User.objects.filter(username=serializer.validated_data['username']).exists():
             return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             self.perform_create(serializer)

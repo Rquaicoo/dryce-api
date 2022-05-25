@@ -18,16 +18,14 @@ class Cart(models.Model):
     status = models.CharField(max_length=10, blank=True, null=True)
     identifier = models.CharField(max_length=10, blank=True, null=True)
     
-    tshirts = models.IntegerField(blank=True, null=True)
+    shirts = models.IntegerField(blank=True, null=True)
     jeans = models.IntegerField(blank=True, null=True)
-    siglets = models.IntegerField(blank=True, null=True)
-    jackets = models.IntegerField(blank=True, null=True)
+
+    cardigans = models.IntegerField(blank=True, null=True)
     trousers = models.IntegerField(blank=True, null=True)
-    suits = models.IntegerField(blank=True, null=True)
-    blazers = models.IntegerField(blank=True, null=True)
-    skirts = models.IntegerField(blank=True, null=True)
+
+    dress = models.IntegerField(blank=True, null=True)
     blouses = models.IntegerField(blank=True, null=True)
-    ties = models.IntegerField(blank=True, null=True)
     
 
     def __str__(self):
