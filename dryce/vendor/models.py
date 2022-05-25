@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 
 class Vendor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=4, blank=True, null=True)
     verified = models.BooleanField(default=False)
     certified = models.BooleanField(default=False)
     rating = models.IntegerField(default=0)
