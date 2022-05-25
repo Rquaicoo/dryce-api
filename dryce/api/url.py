@@ -6,6 +6,9 @@ from .views import *
 from rest_framework.authtoken.views import obtain_auth_token
 urlpatterns = [
     path('auth/register/', CreateUserView.as_view(), name="register"),
+    path('auth/validate_email/', ValidEmailAPIView.as_view(), name="validate_email"),
+    path('auth/validate_username/', ValidUsernameAPIView.as_view(), name="validate_username"),
+
     path('auth/login/', obtain_auth_token, name="login"),
     path('auth/logout/', LogoutUserAPIView.as_view(), name="logout"),
     path('auth/verify_user/', VerifyUserAPIView.as_view(), name="verify_user"),
