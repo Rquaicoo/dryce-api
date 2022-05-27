@@ -136,23 +136,14 @@ class ValidUsernameAPIView(APIView):
 
     
 class OTPAPIView(APIView):
-    def get(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            regular_user = RegularUser.objects.get(user=user)
-            if regular_user.verified:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            else:
-                otp = ''.join(str(random.randint(0,9)) for i in range(4))
-                regular_user.otp = otp
-                regular_user.save()
-                send_mail('OTP', 'Your OTP is ' + otp, 'dryce.com', [user.email], fail_silently=True)
-                return Response({"message": "OTP sent."},status=status.HTTP_200_OK)
+    authentication_classes = []
+    permission_classes = []
 
     def post(self, request):
             data = dict(request.data)
             try:
                 user = User.objects.get(email=data['email'])
+                user = RegularUser.objects.get(user=user)
                 otp = ''.join(str(random.randint(0,9)) for i in range(4))
                 user.otp = otp
                 user.save()
@@ -163,9 +154,13 @@ class OTPAPIView(APIView):
 
 
 class ResetPasswordAPIView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
     def post(self, request):
         data = dict(request.data)
         user = User.objects.get(email=data['email'])
+        user = RegularUser.objects.get(user=user)
         if data['otp'] == user.otp:
             user.set_password(data['password'])
             user.save()
