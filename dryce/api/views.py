@@ -156,10 +156,11 @@ class OTPAPIView(APIView):
 class ResetPasswordAPIView(APIView):
     authentication_classes = []
     permission_classes = []
-    
+
     def post(self, request):
         data = dict(request.data)
         user = User.objects.get(email=data['email'])
+        user = RegularUser.objects.get(user=user)
         if data['otp'] == user.otp:
             user.set_password(data['password'])
             user.save()
