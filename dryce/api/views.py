@@ -207,7 +207,7 @@ class CartAPIView(APIView):
     def get(self, request):
         if request.user.is_authenticated:
             user = RegularUser.objects.get(user=request.user)
-            cart = Cart.objects.filter(user=user, status="pending")
+            cart = Cart.objects.get(user=user, status="pending")
             serializer = CartSerializer(cart)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
@@ -260,6 +260,34 @@ class CartAPIView(APIView):
             cart=Cart.objects.filter(user=user, status="pending")
             cart.delete()
             return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class OrderAPIView(APIView):
+    def get(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            user = RegularUser.objects.get(user=user)
+            order = Order.objects.filter(user=user)
+            serializer = OrderSerializer(order, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            user = RegularUser.objects.get(user=user)
+            data = dict(request.data)
+            cart = data["cart"]
+            payment_method = data["payment_method"]
+            delivery = data["delivery"]
+            
+            try:
+                Order.objects.create(user=user, cart=cart, payment_method=payment_method, delivery=delivery)
+                return Response(status=status.HTTP_200_OK)
+            except:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

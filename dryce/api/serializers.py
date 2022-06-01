@@ -29,16 +29,6 @@ class RegularUserSerializer(serializers.ModelSerializer):
         model = RegularUser
         fields = ('id','user', 'verified', 'name', 'address', 'phone')
 
-class VerifyUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RegularUser
-        fields = ('id','otp')
-
-class ResetOTPSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RegularUser
-        fields = ('otp',)
-    
 class ResetPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -56,9 +46,14 @@ class SearchRegularUserSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
-        fields = ('id', 'user', 'identifier', 'tshirts', 
-        'jeans', 'siglets', 'jackets', 'trousers', 'suits', 
-        'blazers', 'skirts', 'blouses', 'ties', 'cost')
+        fields = ('id', 'user', 'vendor', 'identifier', 'shirts', 
+        'jeans', 'cardigans', 'trousers', 'dress', 
+        'blouses', 'cost')
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ('id', 'user', 'cart', 'payment_method', 'delivery')
 
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
