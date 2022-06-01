@@ -71,8 +71,10 @@ class CreateUserView(CreateAPIView):
 class LogoutUserAPIView(APIView):
     
     def get(self, request,):
-        request.user.auth_token.delete()
-        return Response(status=status.HTTP_200_OK)
+        if request.user.is_authenticated:
+            token = Token.objects.get(user=request.user)
+            token.delete()
+            return Response(status=status.HTTP_200_OK)
     
     def post(self, request):
         #delete the token
@@ -176,26 +178,36 @@ class SearchRegulerUserAPIView(APIView):
         serializer = SearchRegularUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class ProfileAPIView(APIView):
     def get(self, request):
-        user = request.user
-        serializer = ProfileSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.user.is_authenticated:
+            user = request.user
+            regular_user = RegularUser.objects.get(user=user)
+            user_serializer = ProfileSerializer(user)
+            regular_user_serializer = RegularUserSerializer(regular_user)
+            return Response({"user": user_serializer.data, "regular_user": regular_user_serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def post(self, request):
-        data = dict(request.data)
-        user = request.user
-        user.first_name = data['first_name']
-        user.last_name = data['last_name']
-        user.save()
-        return Response(status=status.HTTP_200_OK)
+    def put(self, request):
+        if request.user.is_authenticated:
+            data = dict(request.data)
+            user = request.user
+            user = RegularUser.objects.get(user=user)
+            user.name = data['name']
+            user.address = data['address']
+            user.phone = data['phone']
+            user.save()
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class CartAPIView(APIView):
     def get(self, request):
         if request.user.is_authenticated:
             user = RegularUser.objects.get(user=request.user)
-            cart = Cart.objects.get(user=user)
+            cart = Cart.objects.get(user=user, status="pending")
             serializer = CartSerializer(cart)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
@@ -204,35 +216,78 @@ class CartAPIView(APIView):
     def post(self, request):
         if request.user.is_authenticated:
             user = request.user
-            cart = RegularUser.objects.get(user=user)
-            serializer = CartSerializer(cart, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            #check if cart with status pending exists
+            if Cart.objects.filter(user=user, status="pending").exists():
+                return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
             else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                data = dict(request.data)
+                shirts = int(data["shirt"])
+                jeans = int(data["jeans"])
+                cardigans = int(data["cardigan"])
+                trousers = int(data["trouser"])
+                dress = int(data["dress"])
+                blouses = int(data["blouses"])
+
+                #create id for cart
+                id = ''.join(str(random.randint(0,9)) for i in range(10))
+                cost = (shirts * 30) + (jeans * 30) * (cardigans * 30) * (trousers * 30) * (dress * 30) * (blouses * 30)
+                Cart.objects.create(user=user, shirts=shirts, jeans=jeans, cardigans=cardigans, trousers=trousers, dress=dress, blouses=blouses, cost=cost, identifier=id, status="pending")
+                return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
         if request.user.is_authenticated:
             user = request.user
-            cart = RegularUser.objects.get(user=user)
-            serializer = CartSerializer(cart, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            data = dict(request.data)
+            cart = Cart.objects.get(user=user, status="pending")
+            cart.shirts = int(data["shirt"])
+            cart.jeans = int(data["jeans"])
+            cart.cardigans = int(data["cardigan"])
+            cart.trousers = int(data["trouser"])
+            cart.dress = int(data["dress"])
+            cart.blouses = int(data["blouses"])
+            cart.cost = (cart.shirts * 30) + (cart.jeans * 30) * (cart.cardigans * 30) * (cart.trousers * 30) * (cart.dress * 30) * (cart.blouses * 30)
+            cart.save()
+            return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
         if request.user.is_authenticated:
             user = request.user
-            cart = RegularUser.objects.get(user=user)
+            cart=Cart.objects.filter(user=user, status="pending")
             cart.delete()
             return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class OrderAPIView(APIView):
+    def get(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            user = RegularUser.objects.get(user=user)
+            order = Order.objects.filter(user=user)
+            serializer = OrderSerializer(order, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            user = request.user
+            user = RegularUser.objects.get(user=user)
+            data = dict(request.data)
+            cart = data["cart"]
+            payment_method = data["payment_method"]
+            delivery = data["delivery"]
+            
+            try:
+                Order.objects.create(user=user, cart=cart, payment_method=payment_method, delivery=delivery)
+                return Response(status=status.HTTP_200_OK)
+            except:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

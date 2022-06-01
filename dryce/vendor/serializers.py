@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import *
+import base64
+
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -30,9 +32,21 @@ class VendorViewSerializer(serializers.ModelSerializer):
         fields = ('id','user',)
 
 class VendorDetailsSerializer(serializers.ModelSerializer):
+    name = serializers.JSONField()
+    phone = serializers.JSONField()
+    address = serializers.JSONField()
+    email = serializers.JSONField()
+    city = serializers.JSONField()
+    region = serializers.JSONField()
+    description = serializers.JSONField()
+    longitude = serializers.JSONField()
+    latitude = serializers.JSONField()
+    description = serializers.JSONField()
+    picture = serializers.ImageField()
+
     class Meta:
         model = VendorDetails
-        fields = ('id','vendor', 'business_certificate', 'resume', 'business_name', 'phone_number', 'business_picture', 'location')
+        fields = ('id', 'name', 'phone', 'address', 'email', 'city', 'region', 'description','certificate', 'logo', 'picture', 'latitude', 'longitude')
 
 class VerifyVendorSerializer(serializers.ModelSerializer):
     class Meta:
