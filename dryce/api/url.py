@@ -15,7 +15,9 @@ urlpatterns = [
     path('auth/vendor/register/', CreateUserView.as_view(), name="vendor_register"),
     path('auth/resend_otp/', OTPAPIView.as_view(), name="resend_otp"),
     path('auth/reset_password/', ResetPasswordAPIView.as_view(), name="reset_password"),
+    
     path('cart/', CartAPIView.as_view(), name="cart"),
     path('rating/', RatingAPIView.as_view(), name="rating"),
     path('contact/', ContactAPIView.as_view(), name="contact"),
+    path('profile/', ProfileAPIView.as_view(), name="profile"),
 ]

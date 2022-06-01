@@ -24,10 +24,10 @@ class CreateUserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-class RegularUserView(serializers.ModelSerializer):
+class RegularUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = RegularUser
-        fields = ('id','user',)
+        fields = ('id','user', 'verified', 'name', 'address', 'phone')
 
 class VerifyUserSerializer(serializers.ModelSerializer):
     class Meta:

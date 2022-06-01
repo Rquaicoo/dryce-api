@@ -178,19 +178,29 @@ class SearchRegulerUserAPIView(APIView):
         serializer = SearchRegularUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class ProfileAPIView(APIView):
     def get(self, request):
-        user = request.user
-        serializer = ProfileSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.user.is_authenticated:
+            user = request.user
+            regular_user = RegularUser.objects.get(user=user)
+            user_serializer = ProfileSerializer(user)
+            regular_user_serializer = RegularUserSerializer(regular_user)
+            return Response({"user": user_serializer.data, "regular_user": regular_user_serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def post(self, request):
-        data = dict(request.data)
-        user = request.user
-        user.first_name = data['first_name']
-        user.last_name = data['last_name']
-        user.save()
-        return Response(status=status.HTTP_200_OK)
+    def put(self, request):
+        if request.user.is_authenticated:
+            data = dict(request.data)
+            user = request.user
+            user = RegularUser.objects.get(user=user)
+            user.name = data['name']
+            user.address = data['address']
+            user.phone = data['phone']
+            user.save()
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class CartAPIView(APIView):
@@ -250,16 +260,6 @@ class CartAPIView(APIView):
             cart=Cart.objects.filter(user=user, status="pending")
             cart.delete()
             return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-class HistoryAPIView(APIView):
-    def get(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            history = History.objects.filter(user=user)
-            serializer = HistorySerializer(history, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
