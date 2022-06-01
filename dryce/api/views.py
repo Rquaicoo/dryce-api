@@ -199,6 +199,7 @@ class ProfileAPIView(APIView):
             user.address = data['address']
             user.phone = data['phone']
             user.save()
+            return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
