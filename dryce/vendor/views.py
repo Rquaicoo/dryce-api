@@ -136,6 +136,29 @@ class SearchVendorAPIView(APIView):
         serializer = VendorViewSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class VendorDetailsAPIView(APIView):
+    def get(self, request):
+        user = request.user
+        vendor = Vendor.objects.get(user=user)
+        serializer = VendorDetailsSerializer(vendor)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            data = dict(request.data)
+            user = request.user
+            vendor = Vendor.objects.get(user=user)
+            serializer = VendorDetailsSerializer(vendor, data=data)
+            if serializer.is_valid():
+                print(True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                print(False)
+                print(serializer.data)
+                return Response(serializer.errors, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class RatingVendorAPIView(APIView):
     def get(self, request):

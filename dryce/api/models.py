@@ -1,3 +1,4 @@
+from pyexpat import model
 from unicodedata import name
 from django.db import models
 from django.contrib.auth.models import User
@@ -8,12 +9,16 @@ class RegularUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     otp = models.CharField(max_length=4, blank=True, null=True)
     verified = models.BooleanField(default=False)
+    name = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(max_length=100,null=True, blank=True)
+    phone = models.CharField(max_length=10, null=True, blank=True)
 
     def __str__(self):
-        return str(self.user.username)
+        return str(self.user)
 
 class Cart(models.Model):
     user = models.ForeignKey(RegularUser, on_delete=models.CASCADE)
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     cost = models.IntegerField(blank=True, null=True)
     status = models.CharField(max_length=10, blank=True, null=True)
     identifier = models.CharField(max_length=10, blank=True, null=True)
@@ -29,7 +34,13 @@ class Cart(models.Model):
     
 
     def __str__(self):
-        return str(self.user.username)
+        return str(self.user)
+
+class Order(models.Model):
+    user = models.ForeignKey(RegularUser, on_delete=models.CASCADE)
+    cart = models.OneToOneField(Cart, on_delete=models.CASCADE)
+    payment_method = models.CharField(max_length=15, blank=True, null=True)
+    delivery = models.CharField(max_length=50, null=True, blank=True)
 
 class VendorChat(models.Model):
     user = models.ForeignKey(RegularUser, on_delete=models.CASCADE)
@@ -38,7 +49,7 @@ class VendorChat(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.user.username)
+        return str(self.user)
 
 
 class Contact(models.Model):
