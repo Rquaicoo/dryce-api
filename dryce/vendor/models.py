@@ -8,7 +8,6 @@ class Vendor(models.Model):
     otp = models.CharField(max_length=4, blank=True, null=True)
     verified = models.BooleanField(default=False)
     certified = models.BooleanField(default=False)
-    rating = models.IntegerField(default=0)
     rating_count = models.IntegerField(default=0)
 
     def __str__(self):
@@ -23,10 +22,10 @@ class VendorDetails(models.Model):
     address = models.CharField(max_length=100, blank=False, null=False)
     email = models.EmailField(blank=True, null=True)
     city = models.CharField(max_length=100, blank=False, null=False)
-    region = models.CharField(max_length=100, blank=False, null=False)
-    description = models.CharField(max_length=100, blank=False, null=False)
-    certificate=models.FileField(blank=False)
-     
+    region = models.CharField(max_length=100, blank=True, null=True)
+    description = models.CharField(max_length=100, blank=True, null=True)
+    certificate=models.FileField(blank=True)
+    rating = models.IntegerField(default=5)
     picture=models.ImageField(blank=True)
     logo=models.ImageField(blank=True)
     

@@ -46,7 +46,7 @@ class VendorDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VendorDetails
-        fields = ('id', 'name', 'phone', 'address', 'email', 'city', 'region', 'description','certificate', 'logo', 'picture', 'latitude', 'longitude')
+        fields = ('id', 'name', 'phone', 'address', 'email', 'city', 'region', 'description','certificate', 'logo', 'picture', 'latitude', 'longitude', 'rating', 'vendor')
 
 class VerifyVendorSerializer(serializers.ModelSerializer):
     class Meta:

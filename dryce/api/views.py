@@ -91,9 +91,16 @@ class ContactAPIView(APIView):
 
 
     def post(self, request):
-        serializer = ContactSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        data = dict(request.data)
+        name = data["name"]
+        email = data["email"]
+        message = data["message"]
+
+        Contact.objects.create(
+            name = name,
+            email = email,
+            message = message,
+        )
         return Response(status=status.HTTP_201_CREATED)
 
 
@@ -208,16 +215,19 @@ class CartAPIView(APIView):
     def get(self, request):
         if request.user.is_authenticated:
             user = RegularUser.objects.get(user=request.user)
-            cart = Cart.objects.get(user=user, status="pending")
-            serializer = CartSerializer(cart)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if Cart.objects.get(user=user, status="pending").exists():
+                cart = Cart.objects.get(user=user, status="pending")
+                serializer = CartSerializer(cart)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         if request.user.is_authenticated:
             user = request.user
-
+            user = RegularUser.objects.get(user=user)
             #check if cart with status pending exists
             if Cart.objects.filter(user=user, status="pending").exists():
                 return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -232,8 +242,11 @@ class CartAPIView(APIView):
 
                 #create id for cart
                 id = ''.join(str(random.randint(0,9)) for i in range(10))
+                vendor = Vendor.objects.get(id=data["vendor"])
                 cost = (shirts * 30) + (jeans * 30) * (cardigans * 30) * (trousers * 30) * (dress * 30) * (blouses * 30)
-                Cart.objects.create(user=user, shirts=shirts, jeans=jeans, cardigans=cardigans, trousers=trousers, dress=dress, blouses=blouses, cost=cost, identifier=id, status="pending")
+                Cart.objects.create(user=user, vendor=vendor, 
+                shirts=shirts, jeans=jeans, cardigans=cardigans, trousers=trousers, dress=dress, blouses=blouses,
+                 cost=cost, identifier=id, status="pending")
                 return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -241,6 +254,7 @@ class CartAPIView(APIView):
     def put(self, request):
         if request.user.is_authenticated:
             user = request.user
+            user = RegularUser.objects.get(user=user)
             data = dict(request.data)
             cart = Cart.objects.get(user=user, status="pending")
             cart.shirts = int(data["shirt"])
@@ -258,7 +272,8 @@ class CartAPIView(APIView):
     def delete(self, request):
         if request.user.is_authenticated:
             user = request.user
-            cart=Cart.objects.filter(user=user, status="pending")
+            user = RegularUser.objects.get(user=user)
+            cart=Cart.objects.get(user=user, status="pending")
             cart.delete()
             return Response(status=status.HTTP_200_OK)
         else:
