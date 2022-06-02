@@ -21,6 +21,7 @@ class Cart(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     cost = models.IntegerField(blank=True, null=True)
     status = models.CharField(max_length=10, blank=True, null=True)
+    
     identifier = models.CharField(max_length=10, blank=True, null=True)
     
     shirts = models.IntegerField(blank=True, null=True)
