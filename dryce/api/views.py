@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 #import send_mail
 from django.core.mail import send_mail
 from vendor.models import Vendor
-
+import datetime
 
 def sendEmail(subject, message, from_email, recipient):
     try:
@@ -215,7 +215,7 @@ class CartAPIView(APIView):
     def get(self, request):
         if request.user.is_authenticated:
             user = RegularUser.objects.get(user=request.user)
-            if Cart.objects.get(user=user, status="pending").exists():
+            if Cart.objects.filter(user=user, status="pending").exists():
                 cart = Cart.objects.get(user=user, status="pending")
                 serializer = CartSerializer(cart)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -243,7 +243,7 @@ class CartAPIView(APIView):
                 #create id for cart
                 id = ''.join(str(random.randint(0,9)) for i in range(10))
                 vendor = Vendor.objects.get(id=data["vendor"])
-                cost = (shirts * 30) + (jeans * 30) * (cardigans * 30) * (trousers * 30) * (dress * 30) * (blouses * 30)
+                cost = (shirts * 30) + (jeans * 30) + (cardigans * 30) + (trousers * 30) + (dress * 30) + (blouses * 30)
                 Cart.objects.create(user=user, vendor=vendor, 
                 shirts=shirts, jeans=jeans, cardigans=cardigans, trousers=trousers, dress=dress, blouses=blouses,
                  cost=cost, identifier=id, status="pending")
@@ -263,7 +263,7 @@ class CartAPIView(APIView):
             cart.trousers = int(data["trouser"])
             cart.dress = int(data["dress"])
             cart.blouses = int(data["blouses"])
-            cart.cost = (cart.shirts * 30) + (cart.jeans * 30) * (cart.cardigans * 30) * (cart.trousers * 30) * (cart.dress * 30) * (cart.blouses * 30)
+            cart.cost = (cart.shirts * 30) + (cart.jeans * 30) + (cart.cardigans * 30) + (cart.trousers * 30) + (cart.dress * 30) + (cart.blouses * 30)
             cart.save()
             return Response(status=status.HTTP_200_OK)
         else:
@@ -280,13 +280,19 @@ class CartAPIView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class OrderAPIView(APIView):
-    def get(self, request):
+    def get(self, request, pk=None):
         if request.user.is_authenticated:
             user = request.user
-            user = RegularUser.objects.get(user=user)
-            order = Order.objects.filter(user=user)
-            serializer = OrderSerializer(order, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            
+            if pk:
+                order = Order.objects.get(id=pk)
+                serializer = OrderSerializer(order)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                user = RegularUser.objects.get(user=user)
+                order = Order.objects.filter(user=user)
+                serializer = OrderSerializer(order, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -298,9 +304,12 @@ class OrderAPIView(APIView):
             cart = data["cart"]
             payment_method = data["payment_method"]
             delivery = data["delivery"]
+            date = datetime.datetime.now()
             
             try:
-                Order.objects.create(user=user, cart=cart, payment_method=payment_method, delivery=delivery)
+                Order.objects.create(user=user, cart=cart, payment_method=payment_method, delivery=delivery, date=date)
+                cart = Cart.objects.get(user=user, status="pending")
+                cart.status = "completed"
                 return Response(status=status.HTTP_200_OK)
             except:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
