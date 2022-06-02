@@ -1,3 +1,4 @@
+from datetime import datetime
 from pyexpat import model
 from unicodedata import name
 from django.db import models
@@ -21,7 +22,7 @@ class Cart(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     cost = models.IntegerField(blank=True, null=True)
     status = models.CharField(max_length=10, blank=True, null=True)
-    
+
     identifier = models.CharField(max_length=10, blank=True, null=True)
     
     shirts = models.IntegerField(blank=True, null=True)
@@ -42,6 +43,7 @@ class Order(models.Model):
     cart = models.OneToOneField(Cart, on_delete=models.CASCADE)
     payment_method = models.CharField(max_length=15, blank=True, null=True)
     delivery = models.CharField(max_length=50, null=True, blank=True)
+    date = models.DateTimeField(default=datetime.now, blank=True)
 
 class VendorChat(models.Model):
     user = models.ForeignKey(RegularUser, on_delete=models.CASCADE)
