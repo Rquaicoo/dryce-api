@@ -320,13 +320,13 @@ class OrderAPIView(APIView):
             delivery = data["delivery"]
             date = datetime.datetime.now()
             
-            try:
-                Order.objects.create(user=user, cart=cart, payment_method=payment_method, delivery=delivery, date=date)
-                cart = Cart.objects.get(user=user, status="pending")
-                cart.status = "completed"
-                return Response(status=status.HTTP_200_OK)
-            except:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+            cart = Cart.objects.get(id=cart)
+            Order.objects.create(user=user, cart=cart, payment_method=payment_method, delivery=delivery, date=date)
+            cart = Cart.objects.get(user=user, status="pending")
+            cart.status = "completed"
+            return Response(status=status.HTTP_200_OK)
+            
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

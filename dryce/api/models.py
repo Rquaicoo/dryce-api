@@ -42,7 +42,7 @@ class Cart(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(RegularUser, on_delete=models.CASCADE)
     cart = models.OneToOneField(Cart, on_delete=models.CASCADE)
-    payment_method = models.CharField(max_length=15, blank=True, null=True)
+    payment_method = models.CharField(max_length=50, blank=True, null=True)
     delivery = models.CharField(max_length=50, null=True, blank=True)
     date = models.DateTimeField(default=datetime.now, blank=True)
 
