@@ -325,6 +325,7 @@ class OrderAPIView(APIView):
             Order.objects.create(user=user, cart=cart, payment_method=payment_method, delivery=delivery, date=date)
             cart = Cart.objects.get(user=user, status="pending")
             cart.status = "completed"
+            cart.save()
             return Response(status=status.HTTP_200_OK)
             
         else:
