@@ -137,11 +137,16 @@ class SearchVendorAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class VendorDetailsAPIView(APIView):
-    def get(self, request):
+    def get(self, request, pk=None):
         if request.user.is_authenticated:
-            vendor = VendorDetails.objects.all()
-            serializer = VendorDetailsSerializer(vendor, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if pk:
+                vendor = VendorDetails.objects.get(id=pk)
+                serializer = VendorDetailsSerializer(vendor)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                vendor = VendorDetails.objects.all()
+                serializer = VendorDetailsSerializer(vendor, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         if request.user.is_authenticated:

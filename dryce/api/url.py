@@ -19,6 +19,7 @@ urlpatterns = [
     path('cart/', CartAPIView.as_view(), name="cart"),
     path('order/', OrderAPIView.as_view(), name="order"),
     path('order/<int:pk>/', OrderAPIView.as_view(), name="order_detail"),
+    path('reciepts/', RecieptAPIView.as_view(), name="order_update"),
     path('rating/', RatingAPIView.as_view(), name="rating"),
     path('contact/', ContactAPIView.as_view(), name="contact"),
     path('profile/', ProfileAPIView.as_view(), name="profile"),
