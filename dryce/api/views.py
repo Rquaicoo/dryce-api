@@ -229,7 +229,7 @@ class CartAPIView(APIView):
             user = request.user
             user = RegularUser.objects.get(user=user)
             #check if cart with status pending exists
-            if Cart.objects.filter(user=user, status="pending").exists():
+            if Cart.objects.get(user=user, status="pending").exists():
                 return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
             else:
                 data = dict(request.data)
