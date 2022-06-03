@@ -48,7 +48,7 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = ('id', 'user', 'vendor', 'identifier', 'shirts', 
         'jeans', 'cardigans', 'trousers', 'dress', 
-        'blouses', 'cost')
+        'blouses', 'cost', 'service')
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
