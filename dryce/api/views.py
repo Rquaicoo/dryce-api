@@ -169,8 +169,8 @@ class ResetPasswordAPIView(APIView):
     def post(self, request):
         data = dict(request.data)
         user = User.objects.get(email=data['email'])
-        regular_user = RegularUser.objects.get(user=user)
-        if data['otp'] == regular_user.otp:
+        user = RegularUser.objects.get(user=user)
+        if data['otp'] == user.otp:
             user.set_password(data['password'])
             user.save()
             return Response(status=status.HTTP_200_OK)
@@ -279,19 +279,6 @@ class CartAPIView(APIView):
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-class RecieptAPIView(APIView):
-    def get(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            user = RegularUser.objects.get(user=user)
-            #get cart with status whith status other than pending
-            cart = Cart.objects.filter(user=user)
-            serializer = CartSerializer(cart, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
 
 class OrderAPIView(APIView):
     def get(self, request, pk=None):
