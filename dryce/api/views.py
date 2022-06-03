@@ -239,6 +239,7 @@ class CartAPIView(APIView):
                 trousers = int(data["trouser"])
                 dress = int(data["dress"])
                 blouses = int(data["blouses"])
+                service = str(data["service"])
 
                 #create id for cart
                 id = ''.join(str(random.randint(0,9)) for i in range(10))
@@ -246,7 +247,7 @@ class CartAPIView(APIView):
                 cost = (shirts * 30) + (jeans * 30) + (cardigans * 30) + (trousers * 30) + (dress * 30) + (blouses * 30)
                 Cart.objects.create(user=user, vendor=vendor, 
                 shirts=shirts, jeans=jeans, cardigans=cardigans, trousers=trousers, dress=dress, blouses=blouses,
-                 cost=cost, identifier=id, status="pending")
+                 cost=cost, identifier=id, status="pending", service=service)
                 return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -283,7 +284,7 @@ class OrderAPIView(APIView):
     def get(self, request, pk=None):
         if request.user.is_authenticated:
             user = request.user
-            
+
             if pk:
                 order = Order.objects.get(id=pk)
                 serializer = OrderSerializer(order)
