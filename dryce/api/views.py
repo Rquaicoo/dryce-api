@@ -229,7 +229,7 @@ class CartAPIView(APIView):
             user = request.user
             user = RegularUser.objects.get(user=user)
             #check if cart with status pending exists
-            if Cart.objects.get(user=user, status="pending").exists():
+            if Cart.objects.filter(user=user, status="pending").exists():
                 return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
             else:
                 data = dict(request.data)
@@ -320,13 +320,14 @@ class OrderAPIView(APIView):
             delivery = data["delivery"]
             date = datetime.datetime.now()
             
-            try:
-                Order.objects.create(user=user, cart=cart, payment_method=payment_method, delivery=delivery, date=date)
-                cart = Cart.objects.get(user=user, status="pending")
-                cart.status = "completed"
-                return Response(status=status.HTTP_200_OK)
-            except:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+            cart = Cart.objects.get(id=cart)
+            Order.objects.create(user=user, cart=cart, payment_method=payment_method, delivery=delivery, date=date)
+            cart = Cart.objects.get(user=user, status="pending")
+            cart.status = "completed"
+            cart.save()
+            return Response(status=status.HTTP_200_OK)
+            
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
